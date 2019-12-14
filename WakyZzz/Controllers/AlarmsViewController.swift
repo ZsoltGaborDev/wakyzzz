@@ -39,19 +39,17 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func populateAlarms() {
-        let results = DataManager.realm.objects(Alarm.self)
-        
-        
-        
-        if results.count > 0 {
-            for result in results {
-
-//         *** uncomment to clean the storage ***
-//                try! DataManager.realm.write {
-//                    DataManager.realm.delete(result)
-//                }
-                alarms.append(result)
+        alarms.removeAll()
+        let savedAlarms = DataManager.realm.objects(Alarm.self)
+        for alarm in savedAlarms {
+            //alarms.append(item)
+            
+            // **** uncomment to clean the storage****
+            try! DataManager.realm.write {
+                DataManager.realm.delete(alarm)
             }
+            
+            
         }
     }
     
@@ -92,9 +90,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let alarmToDelete = sortedAlarms[indexPath.row]
         DataManager.deleteData(alarm: alarmToDelete)
         alarms.removeAll(where: { $0.time == sortedAlarms[indexPath.row].time})
-        
         sortAlarms()
-        
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
     }
@@ -110,7 +106,20 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         sortAlarms()
         tableView.insertRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
-        DataManager.saveData(alarm: alarm)
+        let savedAlarms = DataManager.realm.objects(Alarm.self)
+        if savedAlarms.count < alarms.count {
+            DataManager.saveData(alarm: alarms.last!)
+            print("to be saved : \(alarms.last?.caption)")
+            print("to be saved: \(alarms.last?.alarmDate)")
+            print("to be saved: \(alarms.last?.time)")
+        }
+        for saved in savedAlarms {
+            let temp = saved
+            print("saved : \(temp.caption)")
+            print("saved: \(temp.alarmDate)")
+            print("saved: \(temp.time)")
+        }
+        
     }
     
     func sortAlarms() {
@@ -136,7 +145,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 let calendar = Calendar.current
                 let hour = calendar.component(.hour, from: (sortedAlarms.first?.alarmDate)!)
                 let minutes = calendar.component(.minute, from: (sortedAlarms.first?.alarmDate)!)
-                self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
+                //self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
             }
         }
         else {
@@ -180,6 +189,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
+            mail.setSubject("Alarm Kindness Message")
             mail.setToRecipients(["zsolt.gabor@hotmail.com"])
             mail.setMessageBody("<p>You're so awesome!</p>", isHTML: true)
 

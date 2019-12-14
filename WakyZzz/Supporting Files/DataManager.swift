@@ -11,15 +11,8 @@ import RealmSwift
 
 class DataManager {
     
-    private init() {
-        
-    }
     static let realm = try! Realm()
     
-    lazy var alarmList: [Alarm] = {
-        var list = [Alarm]()
-        return list
-    }()
     
     static func saveData(alarm: Alarm) {
         try! realm.write {
@@ -36,13 +29,5 @@ class DataManager {
                 }
             }
         }
-    }
-    
-    static func editData() {
-        
-    }
-    
-    static func getAlarms () {
-        
     }
 }

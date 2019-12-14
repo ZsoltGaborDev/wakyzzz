@@ -135,7 +135,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             triggerDate.minute = minutes
             //trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
             
-            trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+            //trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         } else if identifier == "MESSAGE_NOTIFICATION" || identifier == "GENERAL" {
             trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         }
