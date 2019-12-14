@@ -99,6 +99,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
         
         completionHandler()
+        center.removeAllDeliveredNotifications()
     }
     
     func scheduleNotification(hour: Int, minutes: Int, notificationID: String) {
@@ -149,6 +150,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         let snoozeAction = UNNotificationAction(identifier: "Snooze", title: "Snooze", options: [])
         let deleteAction = UNNotificationAction(identifier: "DeleteAction", title: "Delete", options: [.destructive])
+        let okAction = UNNotificationAction(identifier: "OkAction", title: "OK", options: [.destructive])
         let promiseAction = UNNotificationAction(identifier: "Promise", title: "Promise", options: [])
         let sendMessageAction = UNNotificationAction(identifier: "SendMessage", title: "Send Kind Message", options: [])
         let snoozeCategory = UNNotificationCategory(identifier: categoryIdentifire,
@@ -160,7 +162,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                                      intentIdentifiers: [],
                                                      options: [])
         let generalCategory = UNNotificationCategory(identifier: categoryIdentifire,
-                                                     actions: [deleteAction],
+                                                     actions: [okAction],
                                                      intentIdentifiers: [],
                                                      options: [])
         if notificationID == "SNOOZE_NOTIFICATION" {

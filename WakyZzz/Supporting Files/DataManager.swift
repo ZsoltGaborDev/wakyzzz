@@ -11,8 +11,6 @@ import RealmSwift
 
 class DataManager {
     
-    
-    static let shared = DataManager()
     private init() {
         
     }

@@ -15,7 +15,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     @IBOutlet weak var tableView: UITableView!
     
-    let notificationIdentifiers = ["SNOOZE_NOTIFICATION", "MESSAGE_NOTIFICATION"]
     var appDelegate = UIApplication.shared.delegate as? AppDelegate
     var alarms = [Alarm]()
     var editingIndexPath: IndexPath?
@@ -40,37 +39,20 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func populateAlarms() {
+        let results = DataManager.realm.objects(Alarm.self)
         
-        var alarm: Alarm
+        
+        
+        if results.count > 0 {
+            for result in results {
 
-        // Weekdays 5am
-        alarm = Alarm()
-        alarm.time = 5 * 3600
-        for i in 1 ... 5 {
-            alarm.repeatDays[i] = true
-        }
-        alarms.append(alarm)
-
-        // Weekend 9am
-        alarm = Alarm()
-        alarm.time = 9 * 3600
-        alarm.enabled = false
-        alarm.repeatDays[0] = true
-        alarm.repeatDays[6] = true
-        alarms.append(alarm)
-        
-        
-//        alarms.removeAll()
-//        let results = DataManager.realm.objects(Alarm.self)
-//                for result in results {
-//                    print(result.alarmDate, result.caption, result.hour)
-//        //            try! realm.write {
-//        //                realm.delete(result)
-//        //            }
-//                    alarms.append(result)
+//         *** uncomment to clean the storage ***
+//                try! DataManager.realm.write {
+//                    DataManager.realm.delete(result)
 //                }
-//
-        
+                alarms.append(result)
+            }
+        }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -87,7 +69,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if let alarm = alarm(at: indexPath) {
             cell.populate(caption: alarm.caption, subcaption: alarm.repeating, enabled: alarm.enabled)
         }
-        
         return cell
     }
     
@@ -108,9 +89,12 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func deleteAlarm(at indexPath: IndexPath) {
         tableView.beginUpdates()
-        //let alarmToDelete = sortedAlarms[indexPath.row]
-        //DataManager.deleteData(alarm: alarmToDelete)
-        sortedAlarms.remove(at: indexPath.row)
+        let alarmToDelete = sortedAlarms[indexPath.row]
+        DataManager.deleteData(alarm: alarmToDelete)
+        alarms.removeAll(where: { $0.time == sortedAlarms[indexPath.row].time})
+        
+        sortAlarms()
+        
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
     }
@@ -126,7 +110,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         sortAlarms()
         tableView.insertRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
-        //DataManager.saveData(alarm: alarm)
+        DataManager.saveData(alarm: alarm)
     }
     
     func sortAlarms() {
@@ -158,11 +142,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         else {
             sortedAlarms = alarms
         }
-        tableView.reloadData()
-    }
-    func moveAlarm(from originalIndextPath: IndexPath, to targetIndexPath: IndexPath) {
-        let alarm = DataManager.shared.alarmList.remove(at: originalIndextPath.row)
-        DataManager.shared.alarmList.insert(alarm, at: targetIndexPath.row)
         tableView.reloadData()
     }
     
