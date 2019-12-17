@@ -43,7 +43,7 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.delegate = self
         tableView.dataSource = self
         
-        datePicker.date = (alarm?.alarmDate)!
+        datePicker.date = alarm!.date
     }
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -68,13 +68,33 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        alarm?.repeatDays[indexPath.row] = true
-        tableView.cellForRow(at: indexPath)?.accessoryType = (alarm?.repeatDays[indexPath.row])! ? .checkmark : .none
+        let alarmsToModify = DataManager.realm.objects(Alarm.self).filter({$0.date == self.alarm?.date})
+        if let alarmChanged = alarmsToModify.first {
+            try! DataManager.realm.write {
+                alarmChanged.set(repeating: alarmChanged.checkDay(index: indexPath.row))
+                alarmChanged.checkRepeatingDays(alarm: alarmChanged, day: alarmChanged.checkDay(index: indexPath.row), mark: true)
+                tableView.cellForRow(at: indexPath)?.accessoryType = (alarmChanged.repeatDays[indexPath.row]) ? .checkmark : .none
+            }
+        } else {
+            alarm?.set(repeating: alarm!.checkDay(index: indexPath.row))
+            alarm?.checkRepeatingDays(alarm: alarm, day: alarm!.checkDay(index: indexPath.row), mark: true)
+            tableView.cellForRow(at: indexPath)?.accessoryType = (alarm?.repeatDays[indexPath.row])! ? .checkmark : .none
+        }
     }
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        alarm?.repeatDays[indexPath.row] = false
-        tableView.cellForRow(at: indexPath)?.accessoryType = (alarm?.repeatDays[indexPath.row])! ? .checkmark : .none
+        let alarmsToModify = DataManager.realm.objects(Alarm.self).filter({$0.date == self.alarm?.date})
+        if let alarmChanged = alarmsToModify.first {
+            try! DataManager.realm.write {
+                alarmChanged.remove(repeating: alarmChanged.checkDay(index: indexPath.row))
+                alarmChanged.checkRepeatingDays(alarm: alarmChanged, day: alarmChanged.checkDay(index: indexPath.row), mark: false)
+                tableView.cellForRow(at: indexPath)?.accessoryType = (alarmChanged.repeatDays[indexPath.row]) ? .checkmark : .none
+            }
+        } else {
+            alarm?.set(repeating: alarm!.checkDay(index: indexPath.row))
+            alarm?.checkRepeatingDays(alarm: alarm, day: alarm!.checkDay(index: indexPath.row), mark: false)
+            tableView.cellForRow(at: indexPath)?.accessoryType = (alarm?.repeatDays[indexPath.row])! ? .checkmark : .none
+        }
     }
     
     @IBAction func cancelButtonPress(_ sender: Any) {
@@ -86,6 +106,13 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
         presentingViewController?.dismiss(animated: true, completion: nil)
     }
     @IBAction func datePickerValueChanged(_ sender: Any) {
-        alarm?.setTime(date: datePicker.date)
+        let alarmsToModify = DataManager.realm.objects(Alarm.self).filter({$0.date == self.alarm?.date})
+        if let alarmChanged = alarmsToModify.first {
+            try! DataManager.realm.write {
+                alarmChanged.date = datePicker.date
+            }
+        } else {
+            alarm?.date = datePicker.date
+        }
     }
 }

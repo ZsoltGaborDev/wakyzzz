@@ -38,18 +38,21 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         populateAlarms()
     }
     
-    func populateAlarms() {
-        alarms.removeAll()
+    func deleteAll() {
         let savedAlarms = DataManager.realm.objects(Alarm.self)
         for alarm in savedAlarms {
-            //alarms.append(item)
-            
-            // **** uncomment to clean the storage****
             try! DataManager.realm.write {
                 DataManager.realm.delete(alarm)
             }
-            
-            
+        }
+    }
+    
+    func populateAlarms() {
+        alarms.removeAll()
+        let savedAlarms = DataManager.realm.objects(Alarm.self)
+        for alarmToLoad in savedAlarms {
+            alarmToLoad.loadRepeatingDays(alarm: alarmToLoad)
+            alarms.append(alarmToLoad)
         }
     }
     
@@ -65,7 +68,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let cell = tableView.dequeueReusableCell(withIdentifier: "AlarmCell", for: indexPath) as! AlarmTableViewCell
         cell.delegate = self
         if let alarm = alarm(at: indexPath) {
-            cell.populate(caption: alarm.caption, subcaption: alarm.repeating, enabled: alarm.enabled)
+            cell.populate(caption: alarm.caption, subcaption: alarm.subCaption, enabled: alarm.enabled)
         }
         return cell
     }
@@ -88,8 +91,8 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func deleteAlarm(at indexPath: IndexPath) {
         tableView.beginUpdates()
         let alarmToDelete = sortedAlarms[indexPath.row]
+        alarms.removeAll(where: { $0.date == sortedAlarms[indexPath.row].date})
         DataManager.deleteData(alarm: alarmToDelete)
-        alarms.removeAll(where: { $0.time == sortedAlarms[indexPath.row].time})
         sortAlarms()
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
@@ -106,50 +109,35 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         sortAlarms()
         tableView.insertRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
-        let savedAlarms = DataManager.realm.objects(Alarm.self)
-        if savedAlarms.count < alarms.count {
-            DataManager.saveData(alarm: alarms.last!)
-            print("to be saved : \(alarms.last?.caption)")
-            print("to be saved: \(alarms.last?.alarmDate)")
-            print("to be saved: \(alarms.last?.time)")
-        }
-        for saved in savedAlarms {
-            let temp = saved
-            print("saved : \(temp.caption)")
-            print("saved: \(temp.alarmDate)")
-            print("saved: \(temp.time)")
-        }
-        
     }
-    
     func sortAlarms() {
         sortedAlarms.removeAll()
         if alarms.count > 1 {
             let now = Date()
             sortedAlarms = alarms.sorted(by: {
-                if $0.alarmDate! > now {
-                    if $1.alarmDate! > now {
-                        return $0.alarmDate! < $1.alarmDate!
+                if $0.date > now {
+                    if $1.date > now {
+                        return $0.date < $1.date
                     } else {
                         return true
                     }
                 } else {
-                    if $1.alarmDate! > now {
+                    if $1.date > now {
                         return false
                     } else {
-                        return $0.alarmDate! < $1.alarmDate!
+                        return $0.date < $1.date
                     }
                 }
             })
-            if sortedAlarms.count > 0 {
-                let calendar = Calendar.current
-                let hour = calendar.component(.hour, from: (sortedAlarms.first?.alarmDate)!)
-                let minutes = calendar.component(.minute, from: (sortedAlarms.first?.alarmDate)!)
-                //self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
-            }
         }
         else {
             sortedAlarms = alarms
+        }
+        if sortedAlarms.count > 0 {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
+        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
+        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
         }
         tableView.reloadData()
     }
@@ -157,7 +145,9 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func alarmCell(_ cell: AlarmTableViewCell, enabledChanged enabled: Bool) {
         if let indexPath = tableView.indexPath(for: cell) {
             if let alarm = self.alarm(at: indexPath) {
-                alarm.enabled = enabled
+                try! DataManager.realm.write {
+                    alarm.enabled = enabled
+                }
             }
         }
     }
@@ -174,11 +164,11 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func alarmViewControllerDone(alarm: Alarm) {
         if let editingIndexPath = editingIndexPath {
             tableView.reloadRows(at: [editingIndexPath], with: .automatic)
-        }
-        else {
+        } else {
             addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
         }
         editingIndexPath = nil
+        populateAlarms()
         sortAlarms()
     }
     

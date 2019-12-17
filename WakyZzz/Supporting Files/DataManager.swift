@@ -23,7 +23,7 @@ class DataManager {
     static func deleteData(alarm: Alarm) {
         let results = realm.objects(Alarm.self)
         for result in results {
-            if result.alarmDate == alarm.alarmDate {
+            if result.date == alarm.date {
                 try! realm.write {
                     realm.delete(alarm)
                 }
