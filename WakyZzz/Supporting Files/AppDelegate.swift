@@ -15,12 +15,17 @@ protocol SendMessageDelegate {
     func sendEmail()
 }
 
+protocol DisactivateAlarmDelegate {
+    func disableOneTimeAlarm()
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     let notificationCenter = UNUserNotificationCenter.current()
     var sendMessageDelegate: SendMessageDelegate?
+    var disableAlarmDelegate: DisactivateAlarmDelegate?
     
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -92,6 +97,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
         completionHandler()
         center.removeAllDeliveredNotifications()
+        disableAlarmDelegate?.disableOneTimeAlarm()
     }
     
     func scheduleNotification(hour: Int, minutes: Int, notificationID: String) {

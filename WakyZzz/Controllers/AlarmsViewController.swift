@@ -11,7 +11,7 @@ import RealmSwift
 import MessageUI
 
 
-class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate, MFMailComposeViewControllerDelegate, SendMessageDelegate {
+class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate, MFMailComposeViewControllerDelegate, SendMessageDelegate, DisactivateAlarmDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -29,6 +29,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
   //      deleteAll()
         config()
         appDelegate?.sendMessageDelegate = self
+        appDelegate?.disableAlarmDelegate = self
     }
     override func viewDidAppear(_ animated: Bool) {
         populateAlarms()
@@ -66,7 +67,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "AlarmCell", for: indexPath) as! AlarmTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: K.alarmCellID, for: indexPath) as! AlarmTableViewCell
         cell.delegate = self
         if let alarm = alarm(at: indexPath) {
             cell.populate(caption: alarm.caption, subcaption: alarm.subCaption, enabled: alarm.enabled)
@@ -140,16 +141,29 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
             if sortedAlarms.first!.enabled {
                 for day in sortedAlarms.first!.days {
                     let alarmDay = day.get()
-                    if alarmDay == getTodayWeekDay() {
+                    if alarmDay == getTodayWeekDay() || sortedAlarms.first!.subCaption == K.oneTimeAlarmText{
                         let calendar = Calendar.current
                         let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
                         let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
-                        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
+                        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: K.Notifications.snoozeNotificationID)
                     }
                 }
             }
         }
         tableView.reloadData()
+    }
+    
+    func disableOneTimeAlarm() {
+        if sortedAlarms.first!.subCaption == K.oneTimeAlarmText {
+            let results = DataManager.realm.objects(Alarm.self)
+            for result in results {
+                if result.date == sortedAlarms.first!.date {
+                    try! DataManager.realm.write {
+                        result.enabled = false
+                    }
+                }
+            }
+        }
     }
     
     func getTodayWeekDay()-> String{
@@ -201,8 +215,8 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
-            mail.setSubject("Alarm Kindness Message")
-            mail.setToRecipients(["zsolt.gabor@hotmail.com"])
+            mail.setSubject(K.kindnessMessageMailSubject)
+            mail.setToRecipients(["testmypalinkapp@gmail.com"])
             mail.setMessageBody("<p>You're so awesome!</p>", isHTML: true)
 
             present(mail, animated: true)

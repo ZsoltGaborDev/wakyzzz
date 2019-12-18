@@ -11,6 +11,9 @@ import Foundation
 struct K {
     static let mainAlarmSoundName = "sound.caf"
     static let secondAlarmSoundName = "sound2.caf"
+    static let oneTimeAlarmText = "One time alarm"
+    static let alarmCellID = "AlarmCell"
+    static let kindnessMessageMailSubject = "Alarm Kindness Message"
     
     
     struct Notifications {
