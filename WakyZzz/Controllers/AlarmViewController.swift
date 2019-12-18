@@ -35,6 +35,7 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if alarm == nil {
             navigationItem.title = "New Alarm"
             alarm = Alarm()
+            alarm?.setDefaultDate()
         }
         else {
             navigationItem.title = "Edit Alarm"

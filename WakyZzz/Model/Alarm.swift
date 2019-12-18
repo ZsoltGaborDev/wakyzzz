@@ -9,20 +9,40 @@
 import UIKit
 import RealmSwift
 
-enum Day: Int {
-    case Sunday = 1
-    case Monday
-    case Tuesday
-    case Wednesday
-    case Thursday
-    case Friday
-    case Saturday
+enum Day: String {
+    case Sunday = "Sunday"
+    case Monday = "Monday"
+    case Tuesday = "Tuesday"
+    case Wednesday = "Wednesday"
+    case Thursday = "Thursday"
+    case Friday = "Friday"
+    case Saturday = "Saturday"
+    
+    func get() -> String {
+        switch self {
+        case .Sunday:
+            return "Sunday"
+        case .Monday:
+            return "Monday"
+        case .Tuesday:
+            return "Tuesday"
+        case .Wednesday:
+            return "Wednesday"
+        case .Thursday:
+            return "Thursday"
+        case .Friday:
+            return "Friday"
+        case .Saturday:
+            return "Saturday"
+        }
+    }
 }
 
 class Alarm: Object {
     @objc dynamic public var date = Date()
     @objc dynamic public private(set) var repeatingDays: String = ""
     public private(set) var days = [Day]()
+    @objc dynamic public var enabled = true
     var repeatDays = [false, false, false, false, false, false, false]
     
     public func set(repeating day: Day) {
@@ -88,8 +108,6 @@ class Alarm: Object {
         return captions.count > 0 ? captions.joined(separator: ", ") : "One time alarm"
     }
     
-    var enabled = true
-    
     public func checkRepeatingDays(alarm: Alarm?, day: Day, mark: Bool) {
         switch day {
         case .Sunday:
@@ -134,18 +152,25 @@ class Alarm: Object {
         for i in alarm.repeatingDays {
             if i == "S"{
                 repeatDays[0] = true
+                alarm.days.append(.Sunday)
             } else if i == "M" {
                 repeatDays[1] = true
+                alarm.days.append(.Monday)
             } else if i == "T" {
                 repeatDays[2] = true
+                alarm.days.append(.Tuesday)
             } else if i == "W" {
                 repeatDays[3] = true
+                alarm.days.append(.Wednesday)
             } else if i == "H" {
                 repeatDays[4] = true
+                alarm.days.append(.Thursday)
             } else if i == "F" {
                 repeatDays[5] = true
+                alarm.days.append(.Friday)
             } else if i == "A" {
                 repeatDays[6] = true
+                alarm.days.append(.Saturday)
             }
         }
     }

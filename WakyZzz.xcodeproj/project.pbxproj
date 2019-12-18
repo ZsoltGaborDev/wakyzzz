@@ -16,6 +16,7 @@
 		0424EB6B20BEF96400E15E46 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0424EB6A20BEF96400E15E46 /* Action.swift */; };
 		0424EB6D20BF022900E15E46 /* AlarmTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0424EB6C20BF022900E15E46 /* AlarmTableViewCell.swift */; };
 		0424EB6F20BF0FAE00E15E46 /* AlarmViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0424EB6E20BF0FAE00E15E46 /* AlarmViewController.swift */; };
+		D7D7E2C823AA6E01005B9A9D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D7E2C723AA6E01005B9A9D /* Constants.swift */; };
 		D7F33AE5239E934400C3B489 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F33AE4239E934400C3B489 /* DataManager.swift */; };
 		D7F33AEE23A02FA800C3B489 /* sound.caf in Resources */ = {isa = PBXBuildFile; fileRef = D7F33AED23A02FA700C3B489 /* sound.caf */; };
 		D7F33AF123A2312E00C3B489 /* sound2.caf in Resources */ = {isa = PBXBuildFile; fileRef = D7F33AF023A2312E00C3B489 /* sound2.caf */; };
@@ -37,6 +38,7 @@
 		0424EB6E20BF0FAE00E15E46 /* AlarmViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmViewController.swift; sourceTree = "<group>"; };
 		2B95D5F33D94D68B52D42953 /* Pods_WakyZzz.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WakyZzz.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D504AC0F91DCAF2203707DA /* Pods-WakyZzz.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WakyZzz.debug.xcconfig"; path = "Target Support Files/Pods-WakyZzz/Pods-WakyZzz.debug.xcconfig"; sourceTree = "<group>"; };
+		D7D7E2C723AA6E01005B9A9D /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D7F33AE4239E934400C3B489 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		D7F33AED23A02FA700C3B489 /* sound.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound.caf; sourceTree = "<group>"; };
 		D7F33AF023A2312E00C3B489 /* sound2.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound2.caf; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 				D7548E1C23916B50006263FF /* Controllers */,
 				D7548E1B23914BA9006263FF /* Components */,
 				D7548E1F23916BE1006263FF /* View */,
+				D7D7E2C923AA6E1B005B9A9D /* Utils */,
 				D7548E1E23916BC3006263FF /* Supporting Files */,
 				0424EB5A20BEF89100E15E46 /* Assets.xcassets */,
 				0424EB5C20BEF89100E15E46 /* LaunchScreen.storyboard */,
@@ -150,6 +153,14 @@
 				0424EB5720BEF89000E15E46 /* Main.storyboard */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		D7D7E2C923AA6E1B005B9A9D /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				D7D7E2C723AA6E01005B9A9D /* Constants.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -278,6 +289,7 @@
 				0424EB6B20BEF96400E15E46 /* Action.swift in Sources */,
 				D7F33AE5239E934400C3B489 /* DataManager.swift in Sources */,
 				0424EB6920BEF93F00E15E46 /* Alarm.swift in Sources */,
+				D7D7E2C823AA6E01005B9A9D /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

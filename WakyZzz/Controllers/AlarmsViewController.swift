@@ -26,16 +26,17 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
 
     override func viewDidLoad() {
         super.viewDidLoad()
+  //      deleteAll()
         config()
         appDelegate?.sendMessageDelegate = self
     }
     override func viewDidAppear(_ animated: Bool) {
+        populateAlarms()
         sortAlarms()
     }
     func config() {
         tableView.delegate = self
         tableView.dataSource = self
-        populateAlarms()
     }
     
     func deleteAll() {
@@ -93,6 +94,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let alarmToDelete = sortedAlarms[indexPath.row]
         alarms.removeAll(where: { $0.date == sortedAlarms[indexPath.row].date})
         DataManager.deleteData(alarm: alarmToDelete)
+        populateAlarms()
         sortAlarms()
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
@@ -109,6 +111,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         sortAlarms()
         tableView.insertRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
+        DataManager.saveData(alarm: alarm)
     }
     func sortAlarms() {
         sortedAlarms.removeAll()
@@ -134,19 +137,38 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
             sortedAlarms = alarms
         }
         if sortedAlarms.count > 0 {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
-        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
-        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
+            if sortedAlarms.first!.enabled {
+                for day in sortedAlarms.first!.days {
+                    let alarmDay = day.get()
+                    if alarmDay == getTodayWeekDay() {
+                        let calendar = Calendar.current
+                        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
+                        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
+                        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: "SNOOZE_NOTIFICATION")
+                    }
+                }
+            }
         }
         tableView.reloadData()
+    }
+    
+    func getTodayWeekDay()-> String{
+          let dateFormatter = DateFormatter()
+          dateFormatter.dateFormat = "EEEE"
+          let weekDay = dateFormatter.string(from: Date())
+          return weekDay
     }
     
     func alarmCell(_ cell: AlarmTableViewCell, enabledChanged enabled: Bool) {
         if let indexPath = tableView.indexPath(for: cell) {
             if let alarm = self.alarm(at: indexPath) {
-                try! DataManager.realm.write {
-                    alarm.enabled = enabled
+                let results = DataManager.realm.objects(Alarm.self)
+                for result in results {
+                    if result.date == alarm.date {
+                        try! DataManager.realm.write {
+                            result.enabled = enabled
+                        }
+                    }
                 }
             }
         }

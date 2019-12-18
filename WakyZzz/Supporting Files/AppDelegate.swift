@@ -42,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
-
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -79,25 +79,17 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        
-        if response.notification.request.identifier == "SNOOZE_NOTIFICATION" {
-            print("Handling notifications with NOOZE_NOTIFICATION Identifier")
-            
-            if response.actionIdentifier == "Snooze" {
-                print("snoozing with MESSAGE_NOTIFICATION ID")
-                scheduleNotification(hour: 0, minutes: 0, notificationID: "MESSAGE_NOTIFICATION")
+        if response.notification.request.identifier == K.Notifications.snoozeNotificationID {
+            if response.actionIdentifier == K.Notifications.snoozeActionID {
+                scheduleNotification(hour: 0, minutes: 0, notificationID: K.Notifications.messageNotificationID)
             }
-            
-            
-        } else if response.notification.request.identifier == "MESSAGE_NOTIFICATION" {
-            print("Handling notifications with MESSAGE_NOTIFICATION Identifier")
-            if  response.actionIdentifier == "Promise" {
-                scheduleNotification(hour: 0, minutes: 0, notificationID: "GENERAL")
-            } else if response.actionIdentifier == "SendMessage" {
+        } else if response.notification.request.identifier == K.Notifications.messageNotificationID {
+            if  response.actionIdentifier == K.Notifications.promiseActionID {
+                scheduleNotification(hour: 0, minutes: 0, notificationID: K.Notifications.generalNotificationID)
+            } else if response.actionIdentifier == K.Notifications.sendMessageActionID {
                 sendMessageDelegate!.sendEmail()
             }
         }
-        
         completionHandler()
         center.removeAllDeliveredNotifications()
     }
@@ -105,39 +97,33 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func scheduleNotification(hour: Int, minutes: Int, notificationID: String) {
         
         let content = UNMutableNotificationContent()
-        let categoryIdentifire = "Alert Notification Type"
-        
-        
-        if notificationID == "MESSAGE_NOTIFICATION" {
-            content.title = "Send a kind message!"
-            content.body = "Send one kind message now to one of your contacts, or promise to do this later."
-            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "sound.caf"))
-        } else if notificationID == "SNOOZE_NOTIFICATION" {
-            content.title = "Late wake up call"
-            content.body = "The early bird catches the worm, but the second mouse gets the cheese."
-            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "sound2.caf"))
-        } else if notificationID == "GENERAL"{
-            content.title = "Promise Reminder"
-            content.body = "Keep your promise and do one Kindness."
+        let categoryIdentifire = K.Notifications.categoryID
+        if notificationID == K.Notifications.messageNotificationID {
+            content.title = K.Notifications.messageNotificationContentTitle
+            content.body = K.Notifications.messageNotificationContentBody
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: K.mainAlarmSoundName))
+        } else if notificationID == K.Notifications.snoozeNotificationID {
+            content.title = K.Notifications.snoozeNotificationContentTitle
+            content.body = K.Notifications.snoozeNotificationContentBody
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: K.secondAlarmSoundName))
+        } else if notificationID == K.Notifications.generalNotificationID{
+            content.title = K.Notifications.promiseNotificationContentTitle
+            content.body = K.Notifications.promiseNotificationContentBody
             content.sound = UNNotificationSound.default
         }
-        
-        
         content.badge = 1
         content.categoryIdentifier = categoryIdentifire
         
         let identifier = notificationID
         var trigger: UNNotificationTrigger!
-        if identifier == "SNOOZE_NOTIFICATION" {
+        if identifier == K.Notifications.snoozeNotificationID {
             let date = Date(timeIntervalSinceNow: 3600)
             var triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: date)
             triggerDate.hour = hour
             triggerDate.minute = minutes
-            //trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
-            
-            //trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        } else if identifier == "MESSAGE_NOTIFICATION" || identifier == "GENERAL" {
-            trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+            trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+        } else if identifier == K.Notifications.messageNotificationID || identifier == K.Notifications.generalNotificationID {
+            trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
         }
         
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
@@ -148,11 +134,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             }
         }
         
-        let snoozeAction = UNNotificationAction(identifier: "Snooze", title: "Snooze", options: [])
-        let deleteAction = UNNotificationAction(identifier: "DeleteAction", title: "Delete", options: [.destructive])
-        let okAction = UNNotificationAction(identifier: "OkAction", title: "OK", options: [.destructive])
-        let promiseAction = UNNotificationAction(identifier: "Promise", title: "Promise", options: [])
-        let sendMessageAction = UNNotificationAction(identifier: "SendMessage", title: "Send Kind Message", options: [])
+        let snoozeAction = UNNotificationAction(identifier: K.Notifications.snoozeActionID, title: K.Notifications.snoozeActionTitle, options: [])
+        let deleteAction = UNNotificationAction(identifier: K.Notifications.deleteActionID, title: K.Notifications.deleteActionTitle, options: [.destructive])
+        let okAction = UNNotificationAction(identifier: K.Notifications.okActionID, title: K.Notifications.okActionTitle, options: [.destructive])
+        let promiseAction = UNNotificationAction(identifier: K.Notifications.promiseActionID, title: K.Notifications.promiseNotificationContentTitle, options: [])
+        let sendMessageAction = UNNotificationAction(identifier: K.Notifications.sendMessageActionID, title: K.Notifications.messageNotificationContentTitle, options: [])
         let snoozeCategory = UNNotificationCategory(identifier: categoryIdentifire,
                                               actions: [snoozeAction, deleteAction],
                                               intentIdentifiers: [],
@@ -165,12 +151,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                                      actions: [okAction],
                                                      intentIdentifiers: [],
                                                      options: [])
-        if notificationID == "SNOOZE_NOTIFICATION" {
+        if notificationID == K.Notifications.snoozeNotificationID {
             notificationCenter.setNotificationCategories([snoozeCategory])
-        } else if notificationID == "MESSAGE_NOTIFICATION" {
+        } else if notificationID == K.Notifications.messageNotificationID {
             notificationCenter.setNotificationCategories([messageCategory])
-        } else if notificationID == "GENERAL" {
+        } else if notificationID == K.Notifications.generalNotificationID {
             notificationCenter.setNotificationCategories([generalCategory])
         }
     }
 }
+
+

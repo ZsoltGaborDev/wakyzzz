@@ -25,7 +25,7 @@ class DataManager {
         for result in results {
             if result.date == alarm.date {
                 try! realm.write {
-                    realm.delete(alarm)
+                    realm.delete(result)
                 }
             }
         }
