@@ -114,8 +114,15 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.endUpdates()
         DataManager.saveData(alarm: alarm)
     }
+    
     func sortAlarms() {
         sortedAlarms.removeAll()
+        sortByDate()
+        addNotificationToAlarm()
+        tableView.reloadData()
+    }
+    
+    func sortByDate() {
         if alarms.count > 1 {
             let now = Date()
             sortedAlarms = alarms.sorted(by: {
@@ -137,6 +144,8 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         else {
             sortedAlarms = alarms
         }
+    }
+    func addNotificationToAlarm() {
         if sortedAlarms.count > 0 {
             if sortedAlarms.first!.enabled {
                 for day in sortedAlarms.first!.days {
@@ -150,7 +159,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 }
             }
         }
-        tableView.reloadData()
     }
     
     func disableOneTimeAlarm() {

@@ -6,12 +6,12 @@
 //  Copyright © 2018 Olga Volkova OC. All rights reserved.
 //
 
-import Foundation
-
-class Action {
-    var caption: String!
-    
-    init(caption: String!) {
-        self.caption = caption
-    }
-}
+//import Foundation
+//
+//class Action {
+//    var caption: String!
+//    
+//    init(caption: String!) {
+//        self.caption = caption
+//    }
+//}

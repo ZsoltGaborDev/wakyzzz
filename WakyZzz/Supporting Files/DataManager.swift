@@ -12,7 +12,7 @@ import RealmSwift
 class DataManager {
     
     static let realm = try! Realm()
-    
+    static var shared = try! Realm().objects(Alarm.self)
     
     static func saveData(alarm: Alarm) {
         try! realm.write {

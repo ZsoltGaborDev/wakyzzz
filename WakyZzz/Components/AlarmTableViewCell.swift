@@ -22,14 +22,7 @@ class AlarmTableViewCell: UITableViewCell {
     var delegate: AlarmCellDelegate?
     
     override func awakeFromNib() {
-        
         super.awakeFromNib()
-        
-        configure()
-    }
-    
-    func configure() {
-        
     }
     
     func populate(caption: String, subcaption: String, enabled: Bool) {
