@@ -11,7 +11,7 @@ import RealmSwift
 import MessageUI
 
 
-class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate, MFMailComposeViewControllerDelegate, SendMessageDelegate, DisactivateAlarmDelegate {
+class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate, SendMessageDelegate, DisactivateAlarmDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -57,7 +57,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
             alarms.append(alarmToLoad)
         }
     }
-    
+    //MARK: Table View Delegates
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -105,7 +105,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         editingIndexPath = indexPath
         presentAlarmViewController(alarm: alarm(at: indexPath))
     }
-    
+    //MARK: Alarm Management (add, sort, edit, delete)
     func addAlarm(_ alarm: Alarm, at indexPath: IndexPath) {
         tableView.beginUpdates()
         alarms.insert(alarm, at: indexPath.row)
@@ -144,29 +144,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         else {
             sortedAlarms = alarms
         }
-    }
-    
-    func addNotificationToAlarm() {
-        if sortedAlarms.count > 0 {
-            if sortedAlarms.first!.enabled {
-                for day in sortedAlarms.first!.days {
-                    let alarmDay = day.get()
-                    if alarmDay == getTodayWeekDay() {
-                        addNotification()
-                    }
-                }
-                if sortedAlarms.first!.subCaption == K.oneTimeAlarmText {
-                    addNotification()
-                }
-            }
-        }
-    }
-    
-    func addNotification() {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
-        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
-        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: K.Notifications.snoozeNotificationID)
     }
     
     func disableOneTimeAlarm() {
@@ -227,14 +204,75 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func alarmViewControllerCancel() {
         editingIndexPath = nil
     }
+    
+    //MARK: Creeate, Add Notification
+    func addNotificationToAlarm() {
+        if sortedAlarms.count > 0 {
+            if sortedAlarms.first!.enabled {
+                for day in sortedAlarms.first!.days {
+                    let alarmDay = day.get()
+                    if alarmDay == getTodayWeekDay() {
+                        createNotification()
+                    }
+                }
+                if sortedAlarms.first!.subCaption == K.oneTimeAlarmText {
+                    createNotification()
+                }
+            }
+        }
+    }
+    
+    func createNotification() {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
+        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
+        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: K.Notifications.snoozeNotificationID)
+    }
+}
+
+extension AlarmsViewController: MFMessageComposeViewControllerDelegate {
+    
+    func sendMessage() {
+        if MFMessageComposeViewController.canSendText() {
+            let messageVC = MFMessageComposeViewController()
+            messageVC.body = "You're so handsome!"
+            messageVC.recipients = ["3803405055"]
+            messageVC.messageComposeDelegate = self
+            self.present(messageVC, animated: true, completion: nil)
+        }
+    }
+    
+    func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+        switch (result) {
+        case .cancelled:
+            print("Message was cancelled")
+            dismiss(animated: true, completion: nil)
+        case .failed:
+            print("Message failed")
+            dismiss(animated: true, completion: nil)
+        case .sent:
+            print("Message was sent")
+            dismiss(animated: true, completion: nil)
+        default:
+            break
+        }
+    }
+}
+
+//MARK: Email Handler
+extension AlarmsViewController: MFMailComposeViewControllerDelegate {
+
     func sendEmail() {
+        let randomMessages = ["<p>You're so awesome!</p>",
+                              "<p>You're so nice!</p>",
+                              "<p>You're the best!</p>",
+                              "<p>I'm so lucky to be your friend</p>"]
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
             mail.setSubject(K.kindnessMessageMailSubject)
             mail.setToRecipients(["testmypalinkapp@gmail.com"])
-            mail.setMessageBody("<p>You're so awesome!</p>", isHTML: true)
-
+            mail.setMessageBody(randomMessages.randomElement()!, isHTML: true)
             present(mail, animated: true)
         } else {
             print("Error sending email")

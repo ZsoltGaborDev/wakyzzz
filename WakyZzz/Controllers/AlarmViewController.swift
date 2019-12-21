@@ -46,6 +46,8 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         datePicker.date = alarm!.date
     }
+    
+    //MARK: Table View Delegates
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -97,7 +99,7 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
             tableView.cellForRow(at: indexPath)?.accessoryType = (alarm?.repeatDays[indexPath.row])! ? .checkmark : .none
         }
     }
-    
+    //MARK: Date Management
     @IBAction func cancelButtonPress(_ sender: Any) {
         presentingViewController?.dismiss(animated: true, completion: nil)
     }
@@ -106,6 +108,7 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
         delegate?.alarmViewControllerDone(alarm: alarm!)
         presentingViewController?.dismiss(animated: true, completion: nil)
     }
+    
     @IBAction func datePickerValueChanged(_ sender: Any) {
         let alarmsToModify = DataManager.realm.objects(Alarm.self).filter({$0.date == self.alarm?.date})
         if let alarmChanged = alarmsToModify.first {

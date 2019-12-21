@@ -13,6 +13,7 @@ import MessageUI
 
 protocol SendMessageDelegate {
     func sendEmail()
+    func sendMessage()
 }
 
 protocol DisactivateAlarmDelegate {
@@ -71,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 }
-
+//MARK: Notification Management
 extension AppDelegate: UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter,
@@ -92,7 +93,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             if  response.actionIdentifier == K.Notifications.promiseActionID {
                 scheduleNotification(hour: 0, minutes: 0, notificationID: K.Notifications.generalNotificationID)
             } else if response.actionIdentifier == K.Notifications.sendMessageActionID {
-                sendMessageDelegate!.sendEmail()
+                let randomAction = [self.sendMessageDelegate?.sendMessage, self.sendMessageDelegate?.sendEmail]
+                randomAction.randomElement()!!()
             }
         }
         completionHandler()
