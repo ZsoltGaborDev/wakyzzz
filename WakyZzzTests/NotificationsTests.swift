@@ -19,28 +19,20 @@ class MockNotificationCenter: UNUserNotificationCenterProtocol {
 
   func add(_ request: UNNotificationRequest,
            withCompletionHandler completionHandler: ((Error?) -> Void)?) {
-    // Do anything you want here for your tests, fulfill the expectation to pass the test.
     addRequestExpectation?.fulfill()
     print("Mock center log")
     completionHandler?(nil)
   }
 }
 
-// Must extend UNUserNotificationCenter to conform to this protocol in order to use it in your class.
 extension UNUserNotificationCenter: UNUserNotificationCenterProtocol {
-// I'm only adding this implementation to show a log message in this example. In order to use the original implementation, don't add it here.
   func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: ((Error?) -> Void)?) {
     print("Notification center log")
     completionHandler?(nil)
   }
 }
 
-/* ExampleClass.swift */
-
 class ExampleClass {
-
-  // Even though the type is UNUserNotificationCenterProtocol, it will take UNUserNotificationCenter type
-  // because of the extension above.
   var notificationCenter: UNUserNotificationCenterProtocol = UNUserNotificationCenter.current()
 
   func doSomething() {
@@ -50,7 +42,6 @@ class ExampleClass {
                                            content: content,
                                            trigger: nil)
     notificationCenter.add(request) { (error: Error?) in
-      // completion handler code
     }
   }
 }
@@ -73,4 +64,3 @@ class NotificationsTests: XCTestCase {
     waitForExpectations(timeout: 1)
   }
 }
-// Once you run the test, the expectation will be called and "Mock Center Log" will be printed

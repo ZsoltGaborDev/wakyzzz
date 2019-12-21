@@ -10,9 +10,9 @@ import XCTest
 @testable import WakyZzz
 
 class AlarmsViewControllerTests: XCTestCase {
-    
+
     var controller: AlarmsViewController!
-    
+
     override func setUp() {
         super.setUp()
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -24,7 +24,7 @@ class AlarmsViewControllerTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-    
+
     func testTitleIsWakyZzz() {
         XCTAssertEqual("WakyZzz", controller.navigationItem.title)
     }
@@ -54,7 +54,7 @@ class AlarmsViewControllerTests: XCTestCase {
         XCTAssertEqual(actualReuseIdentifer, expectedReuseIdentifier)
     }
     func testTableCellHasCorrectLabelText() {
-        
+
         for i in 0..<controller.sortedAlarms.count {
             let cell = controller.tableView(controller.tableView, cellForRowAt: IndexPath(row: i, section: 0)) as? AlarmTableViewCell
             XCTAssertEqual(cell?.captionLabel.text, controller.sortedAlarms[i].caption)

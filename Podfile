@@ -7,6 +7,6 @@ target 'WakyZzz' do
 
   # Pods for WakyZzz
   
-pod ‘RealmSwift’
+pod 'RealmSwift'
 
 end

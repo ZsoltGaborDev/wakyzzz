@@ -145,20 +145,28 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
             sortedAlarms = alarms
         }
     }
+    
     func addNotificationToAlarm() {
         if sortedAlarms.count > 0 {
             if sortedAlarms.first!.enabled {
                 for day in sortedAlarms.first!.days {
                     let alarmDay = day.get()
-                    if alarmDay == getTodayWeekDay() || sortedAlarms.first!.subCaption == K.oneTimeAlarmText{
-                        let calendar = Calendar.current
-                        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
-                        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
-                        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: K.Notifications.snoozeNotificationID)
+                    if alarmDay == getTodayWeekDay() {
+                        addNotification()
                     }
+                }
+                if sortedAlarms.first!.subCaption == K.oneTimeAlarmText {
+                    addNotification()
                 }
             }
         }
+    }
+    
+    func addNotification() {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: sortedAlarms.first!.date)
+        let minutes = calendar.component(.minute, from: sortedAlarms.first!.date)
+        self.appDelegate?.scheduleNotification(hour: hour, minutes: minutes, notificationID: K.Notifications.snoozeNotificationID)
     }
     
     func disableOneTimeAlarm() {

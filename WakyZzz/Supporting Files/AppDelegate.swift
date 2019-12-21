@@ -77,7 +77,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        
+
         completionHandler([.alert, .sound])
     }
     
@@ -123,11 +123,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let identifier = notificationID
         var trigger: UNNotificationTrigger!
         if identifier == K.Notifications.snoozeNotificationID {
-            let date = Date(timeIntervalSinceNow: 3600)
+            let date = Date()
             var triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: date)
             triggerDate.hour = hour
             triggerDate.minute = minutes
+            triggerDate.second = 0
             trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+            
+            //trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
         } else if identifier == K.Notifications.messageNotificationID || identifier == K.Notifications.generalNotificationID {
             trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
         }
