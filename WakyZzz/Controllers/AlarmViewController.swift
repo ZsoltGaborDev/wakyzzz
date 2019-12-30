@@ -11,7 +11,6 @@ import UIKit
 
 protocol AlarmViewControllerDelegate {
     func alarmViewControllerDone(alarm: Alarm)
-    func alarmViewControllerCancel()
 }
 
 class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {

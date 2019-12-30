@@ -17,7 +17,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     var appDelegate = UIApplication.shared.delegate as? AppDelegate
     var alarms = [Alarm]()
-    var editingIndexPath: IndexPath?
     var sortedAlarms = [Alarm]()
     
     @IBAction func addButtonPress(_ sender: Any) {
@@ -102,9 +101,9 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func editAlarm(at indexPath: IndexPath) {
-        editingIndexPath = indexPath
-        presentAlarmViewController(alarm: alarm(at: indexPath))
+        presentAlarmViewController(alarm: sortedAlarms[indexPath.row])
     }
+    
     //MARK: Alarm Management (add, sort, edit, delete)
     func addAlarm(_ alarm: Alarm, at indexPath: IndexPath) {
         tableView.beginUpdates()
@@ -191,18 +190,9 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func alarmViewControllerDone(alarm: Alarm) {
-        if let editingIndexPath = editingIndexPath {
-            tableView.reloadRows(at: [editingIndexPath], with: .automatic)
-        } else {
-            addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
-        }
-        editingIndexPath = nil
+        addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
         populateAlarms()
         sortAlarms()
-    }
-    
-    func alarmViewControllerCancel() {
-        editingIndexPath = nil
     }
     
     //MARK: Creeate, Add Notification
